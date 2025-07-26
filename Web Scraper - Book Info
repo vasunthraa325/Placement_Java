@@ -1,0 +1,56 @@
+import javax.swing.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class BookScraper {
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Web Scraper - Book Info");
+        frame.setSize(400, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(null);
+
+        JLabel label = new JLabel("Source: books.toscrape.com");
+        label.setBounds(100, 20, 250, 20);
+        frame.add(label);
+
+        JButton scrapeButton = new JButton("Scrape Book Data");
+        scrapeButton.setBounds(110, 60, 180, 40);
+        frame.add(scrapeButton);
+
+        scrapeButton.addActionListener(e -> scrapeBooks());
+
+        frame.setLocationRelativeTo(null); // center the window
+        frame.setVisible(true);
+    }
+
+    public static void scrapeBooks() {
+        String url = "https://books.toscrape.com/";
+        StringBuilder csvData = new StringBuilder();
+        csvData.append("Title,Price,Availability\n");
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements books = doc.select("article.product_pod");
+
+            for (Element book : books) {
+                String title = book.select("h3 a").attr("title");
+                String price = book.select("p.price_color").text();
+                String stock = book.select("p.instock.availability").text().trim();
+                csvData.append(String.format("\"%s\",\"%s\",\"%s\"\n", title, price, stock));
+            }
+
+            FileWriter writer = new FileWriter("books_data.csv");
+            writer.write(csvData.toString());
+            writer.close();
+
+            JOptionPane.showMessageDialog(null, "Data scraped and saved to books_data.csv", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Error occurred:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
