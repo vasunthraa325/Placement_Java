@@ -1,0 +1,58 @@
+// SimpleChatbot.java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+public class SimpleChatbot extends JFrame {
+    private JTextArea chatArea;
+    private JTextField inputField;
+    private Map<String,String> knowledge;
+
+    public SimpleChatbot() {
+        super("Java Interview Bot");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500,400);
+        setLayout(new BorderLayout(6,6));
+
+        chatArea = new JTextArea(); chatArea.setEditable(false);
+        inputField = new JTextField();
+
+        add(new JScrollPane(chatArea), BorderLayout.CENTER);
+        add(inputField, BorderLayout.SOUTH);
+
+        knowledge = new HashMap<>();
+        knowledge.put("hello", "Hello! I'm the Java Interview Bot. Ask me about Java basics, OOP, or algorithms.");
+        knowledge.put("java", "Java is an object-oriented programming language. Its major features: platform independence, OOP, rich API.");
+        knowledge.put("oops", "OOPs stands for Object-Oriented Programming: Encapsulation, Inheritance, Polymorphism, Abstraction.");
+        knowledge.put("polymorphism","Polymorphism allows objects to be treated as instances of their parent class. Overloading & overriding are types.");
+        knowledge.put("inheritance","Inheritance lets a class derive properties from another class using extends keyword.");
+        knowledge.put("thank you","You're welcome! Good luck for interviews.");
+
+        inputField.addActionListener(e -> process());
+        append("Bot: Hi! Type your question. Try 'hello', 'java', 'oops', 'polymorphism', 'inheritance'.");
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void append(String s) { chatArea.append(s + "\n"); }
+
+    private void process() {
+        String user = inputField.getText().trim();
+        if (user.isEmpty()) return;
+        append("You: " + user);
+        inputField.setText("");
+        String key = user.toLowerCase();
+        String reply = null;
+        // direct match
+        if (knowledge.containsKey(key)) reply = knowledge.get(key);
+        else {
+            // keyword matching
+            for (String k : knowledge.keySet()) if (key.contains(k)) { reply = knowledge.get(k); break; }
+        }
+        if (reply == null) reply = "I don't know that yet. Try asking about 'java', 'oops', or say 'hello'.";
+        append("Bot: " + reply);
+    }
+
+    public static void main(String[] args) { SwingUtilities.invokeLater(SimpleChatbot::new); }
+}
