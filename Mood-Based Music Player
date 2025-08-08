@@ -1,0 +1,95 @@
+// MoodMusicPlayer.java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+public class MoodMusicPlayer extends JFrame {
+    private JTextField moodField;
+    private JTextArea playlistArea;
+    private JLabel nowPlaying;
+
+    private Map<String, List<String>> moodMap;
+
+    public MoodMusicPlayer() {
+        super("Mood-Based Music Player (Simulated)");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(450, 350);
+        setLayout(new BorderLayout(8,8));
+
+        moodMap = new HashMap<>();
+        moodMap.put("happy", Arrays.asList("Sunshine - Artist A", "Joy Ride - Artist B", "Smile Beat - Artist C"));
+        moodMap.put("sad", Arrays.asList("Blue Night - Artist D", "Slow Rain - Artist E"));
+        moodMap.put("energetic", Arrays.asList("Run Fast - Artist F", "Pump Up - Artist G"));
+        moodMap.put("relaxed", Arrays.asList("Calm Waves - Artist H", "Soft Piano - Artist I"));
+
+        JPanel top = new JPanel(new BorderLayout(6,6));
+        moodField = new JTextField();
+        JButton suggestBtn = new JButton("Suggest Playlist");
+        top.add(new JLabel("Enter your mood (eg. happy, sad, energetic, relaxed): "), BorderLayout.NORTH);
+        top.add(moodField, BorderLayout.CENTER);
+        top.add(suggestBtn, BorderLayout.EAST);
+
+        playlistArea = new JTextArea();
+        playlistArea.setEditable(false);
+        JScrollPane sp = new JScrollPane(playlistArea);
+
+        JPanel bottom = new JPanel(new BorderLayout());
+        nowPlaying = new JLabel("Now Playing: —");
+        JButton playBtn = new JButton("Play Selected (simulate)");
+        bottom.add(nowPlaying, BorderLayout.NORTH);
+        bottom.add(playBtn, BorderLayout.SOUTH);
+
+        add(top, BorderLayout.NORTH);
+        add(sp, BorderLayout.CENTER);
+        add(bottom, BorderLayout.SOUTH);
+
+        suggestBtn.addActionListener(e -> suggest());
+        playBtn.addActionListener(e -> playSelected());
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void suggest() {
+        String mood = moodField.getText().trim().toLowerCase();
+        List<String> list = moodMap.getOrDefault(mood, null);
+        playlistArea.setText("");
+        if (list == null) {
+            playlistArea.setText("No curated playlist for \"" + mood + "\".\nTry: happy, sad, energetic, relaxed\n\nSuggested generic playlist:\n- Default Tune - Artist X\n- Default Chill - Artist Y");
+        } else {
+            for (int i=0;i<list.size();i++) {
+                playlistArea.append((i+1) + ". " + list.get(i) + "\n");
+            }
+            playlistArea.append("\nSelect a line and click Play Selected (simulate).");
+        }
+    }
+
+    private void playSelected() {
+        String sel = playlistArea.getSelectedText();
+        if (sel == null || sel.trim().isEmpty()) {
+            // fallback to first line
+            String[] lines = playlistArea.getText().split("\\n");
+            if (lines.length>0 && !lines[0].isEmpty()) sel = lines[0];
+        }
+        if (sel==null || sel.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No song selected to play.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        // simulate playing
+        String song = sel.replaceAll("^\\d+\\.\\s*", "").trim();
+        nowPlaying.setText("Now Playing: " + song);
+        // simple animation: blink label
+        Timer t = new Timer(300, new ActionListener() {
+            int c=0;
+            public void actionPerformed(ActionEvent e) {
+                nowPlaying.setVisible(!nowPlaying.isVisible());
+                c++;
+                if (c>5) { nowPlaying.setVisible(true); ((Timer)e.getSource()).stop(); }
+            }
+        });
+        t.start();
+    }
+
+    public static void main(String[] args) { SwingUtilities.invokeLater(MoodMusicPlayer::new); }
+}
