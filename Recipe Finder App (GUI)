@@ -1,0 +1,63 @@
+// RecipeFinder.java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+
+public class RecipeFinder extends JFrame {
+    private JTextField ingredientsField;
+    private JTextArea resultArea;
+    private Map<String, List<String>> recipeDB;
+
+    public RecipeFinder() {
+        super("Recipe Finder");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500, 350);
+        setLayout(new BorderLayout(6,6));
+
+        recipeDB = new HashMap<>();
+        // simple DB: recipe -> required ingredients
+        recipeDB.put("Tomato Omelette", Arrays.asList("egg","tomato","salt","pepper"));
+        recipeDB.put("Veg Sandwich", Arrays.asList("bread","tomato","lettuce","cheese"));
+        recipeDB.put("Pasta Aglio e Olio", Arrays.asList("pasta","garlic","olive oil","chili"));
+        recipeDB.put("Fried Rice", Arrays.asList("rice","carrot","peas","soy sauce","egg"));
+        recipeDB.put("Fruit Salad", Arrays.asList("apple","banana","orange","honey"));
+
+        JPanel top = new JPanel(new BorderLayout(6,6));
+        ingredientsField = new JTextField();
+        JButton findBtn = new JButton("Find Recipes");
+        top.add(new JLabel("Enter ingredients you have (comma separated): "), BorderLayout.NORTH);
+        top.add(ingredientsField, BorderLayout.CENTER);
+        top.add(findBtn, BorderLayout.EAST);
+
+        resultArea = new JTextArea(); resultArea.setEditable(false);
+        add(top, BorderLayout.NORTH);
+        add(new JScrollPane(resultArea), BorderLayout.CENTER);
+
+        findBtn.addActionListener(e -> findRecipes());
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void findRecipes() {
+        String text = ingredientsField.getText().toLowerCase().replaceAll("\\s+","");
+        if (text.isEmpty()) { JOptionPane.showMessageDialog(this,"Please add ingredients."); return; }
+        Set<String> have = new HashSet<>(Arrays.asList(text.split(",")));
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String,List<String>> entry : recipeDB.entrySet()) {
+            List<String> need = entry.getValue();
+            int matched = 0;
+            for (String ing : need) if (have.contains(ing)) matched++;
+            double pct = 100.0 * matched / need.size();
+            if (pct >= 60.0) { // show suggestions that are 60% satisfied
+                sb.append(entry.getKey()).append(" — matched ").append(matched).append("/").append(need.size()).append("\n");
+                sb.append("Needed: ").append(String.join(", ", need)).append("\n\n");
+            }
+        }
+        if (sb.length()==0) sb.append("No good matches. Try adding basic ingredients like egg, bread, rice, tomato...");
+        resultArea.setText(sb.toString());
+    }
+
+    public static void main(String[] args) { SwingUtilities.invokeLater(RecipeFinder::new); }
+}
