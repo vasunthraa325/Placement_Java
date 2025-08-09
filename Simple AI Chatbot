@@ -1,4 +1,4 @@
-// SimpleChatbot.java
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -44,10 +44,10 @@ public class SimpleChatbot extends JFrame {
         inputField.setText("");
         String key = user.toLowerCase();
         String reply = null;
-        // direct match
+    
         if (knowledge.containsKey(key)) reply = knowledge.get(key);
         else {
-            // keyword matching
+        
             for (String k : knowledge.keySet()) if (key.contains(k)) { reply = knowledge.get(k); break; }
         }
         if (reply == null) reply = "I don't know that yet. Try asking about 'java', 'oops', or say 'hello'.";
