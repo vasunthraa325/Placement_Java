@@ -1,0 +1,88 @@
+import java.util.*;
+
+public class FileSystem {
+
+    private class Node {
+        String name;
+        boolean isFile;
+        Map<String, Node> children;
+
+        Node(String name, boolean isFile) {
+            this.name = name;
+            this.isFile = isFile;
+            if (!isFile) {
+                children = new HashMap<>();
+            }
+        }
+    }
+
+    private final Node root;
+
+    public FileSystem() {
+        root = new Node("/", false);
+    }
+
+    public void createFile(String path) {
+        create(path, true);
+    }
+
+    public void createFolder(String path) {
+        create(path, false);
+    }
+
+    private void create(String path, boolean isFile) {
+        String[] parts = path.split("/");
+        Node current = root;
+
+        for (int i = 1; i < parts.length; i++) {
+            String part = parts[i];
+            if (!current.children.containsKey(part)) {
+                if (i == parts.length - 1) {
+                    current.children.put(part, new Node(part, isFile));
+                } else {
+                    current.children.put(part, new Node(part, false));
+                }
+            }
+            current = current.children.get(part);
+        }
+    }
+
+    public void delete(String path) {
+        deleteHelper(root, path.split("/"), 1);
+    }
+
+    private boolean deleteHelper(Node current, String[] parts, int index) {
+        if (index == parts.length) return false;
+
+        String part = parts[index];
+        Node node = current.children.get(part);
+        if (node == null) return false;
+
+        if (index == parts.length - 1) {
+            current.children.remove(part);
+            return true;
+        }
+
+        boolean deleted = deleteHelper(node, parts, index + 1);
+        if (node.children.isEmpty() && !node.isFile) {
+            current.children.remove(part);
+        }
+        return deleted;
+    }
+
+    public List<String> list(String path) {
+        String[] parts = path.split("/");
+        Node current = root;
+
+        for (int i = 1; i < parts.length; i++) {
+            current = current.children.get(parts[i]);
+            if (current == null) return Collections.emptyList();
+        }
+
+        if (current.isFile) return Collections.singletonList(current.name);
+
+        List<String> result = new ArrayList<>(current.children.keySet());
+        Collections.sort(result);
+        return result;
+    }
+}
