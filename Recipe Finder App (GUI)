@@ -1,4 +1,4 @@
-// RecipeFinder.java
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -16,7 +16,6 @@ public class RecipeFinder extends JFrame {
         setLayout(new BorderLayout(6,6));
 
         recipeDB = new HashMap<>();
-        // simple DB: recipe -> required ingredients
         recipeDB.put("Tomato Omelette", Arrays.asList("egg","tomato","salt","pepper"));
         recipeDB.put("Veg Sandwich", Arrays.asList("bread","tomato","lettuce","cheese"));
         recipeDB.put("Pasta Aglio e Olio", Arrays.asList("pasta","garlic","olive oil","chili"));
@@ -50,7 +49,7 @@ public class RecipeFinder extends JFrame {
             int matched = 0;
             for (String ing : need) if (have.contains(ing)) matched++;
             double pct = 100.0 * matched / need.size();
-            if (pct >= 60.0) { // show suggestions that are 60% satisfied
+            if (pct >= 60.0) { 
                 sb.append(entry.getKey()).append(" — matched ").append(matched).append("/").append(need.size()).append("\n");
                 sb.append("Needed: ").append(String.join(", ", need)).append("\n\n");
             }
