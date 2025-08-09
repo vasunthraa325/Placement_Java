@@ -1,4 +1,4 @@
-// MoodMusicPlayer.java
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -68,7 +68,7 @@ public class MoodMusicPlayer extends JFrame {
     private void playSelected() {
         String sel = playlistArea.getSelectedText();
         if (sel == null || sel.trim().isEmpty()) {
-            // fallback to first line
+          
             String[] lines = playlistArea.getText().split("\\n");
             if (lines.length>0 && !lines[0].isEmpty()) sel = lines[0];
         }
@@ -76,10 +76,10 @@ public class MoodMusicPlayer extends JFrame {
             JOptionPane.showMessageDialog(this, "No song selected to play.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        // simulate playing
+        
         String song = sel.replaceAll("^\\d+\\.\\s*", "").trim();
         nowPlaying.setText("Now Playing: " + song);
-        // simple animation: blink label
+
         Timer t = new Timer(300, new ActionListener() {
             int c=0;
             public void actionPerformed(ActionEvent e) {
