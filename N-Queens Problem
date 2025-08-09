@@ -1,0 +1,45 @@
+import java.util.*;
+
+public class NQueens {
+
+    private int n;
+    private List<List<String>> solutions = new ArrayList<>();
+
+    public List<List<String>> solveNQueens(int n) {
+        this.n = n;
+        int[] board = new int[n]; // board[row] = col position of queen
+        backtrack(0, board);
+        return solutions;
+    }
+
+    private void backtrack(int row, int[] board) {
+        if (row == n) {
+            solutions.add(generateBoard(board));
+            return;
+        }
+        for (int col = 0; col < n; col++) {
+            if (isValid(board, row, col)) {
+                board[row] = col;
+                backtrack(row + 1, board);
+            }
+        }
+    }
+
+    private boolean isValid(int[] board, int row, int col) {
+        for (int i = 0; i < row; i++) {
+            if (board[i] == col || Math.abs(board[i] - col) == row - i) return false;
+        }
+        return true;
+    }
+
+    private List<String> generateBoard(int[] board) {
+        List<String> boardStr = new ArrayList<>();
+        for (int row = 0; row < n; row++) {
+            char[] rowArray = new char[n];
+            Arrays.fill(rowArray, '.');
+            rowArray[board[row]] = 'Q';
+            boardStr.add(new String(rowArray));
+        }
+        return boardStr;
+    }
+}
