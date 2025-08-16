@@ -1,0 +1,19 @@
+class Solution {
+    static class Job{ int s,e,p; Job(int s,int e,int p){this.s=s;this.e=e;this.p=p;} }
+    public int jobScheduling(int[] start, int[] end, int[] profit) {
+        int n=start.length;
+        Job[] a=new Job[n];
+        for(int i=0;i<n;i++) a[i]=new Job(start[i],end[i],profit[i]);
+        Arrays.sort(a, Comparator.comparingInt(j->j.e));
+        int[] ends=new int[n]; for(int i=0;i<n;i++) ends[i]=a[i].e;
+        int[] dp=new int[n]; dp[0]=a[0].p;
+        for(int i=1;i<n;i++){
+            int inc=a[i].p;
+            int j=Arrays.binarySearch(ends,0,i,a[i].s);
+            if(j<0) j=-(j+1)-1;
+            if(j>=0) inc+=dp[j];
+            dp[i]=Math.max(dp[i-1], inc);
+        }
+        return dp[n-1];
+    }
+}
